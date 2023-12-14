@@ -10,8 +10,11 @@ find_package(Threads)
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 endif(MSVC)
+
+## For mbp
+SET(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH} /opt/homebrew/Cellar/icu4c/73.2/lib")
 
 #################$
 # Origin Library #

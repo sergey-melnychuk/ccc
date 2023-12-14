@@ -2,6 +2,7 @@
 #include <catch2/catch.hpp>
 #include <future>
 #include <string>
+#include <thread>
 
 using namespace std;
 
