@@ -14,7 +14,9 @@ else()
 endif(MSVC)
 
 ## For mbp
-SET(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH} /opt/homebrew/Cellar/icu4c/73.2/lib")
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/homebrew/Cellar/icu4c/73.2/lib")
+## For air
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/Cellar/icu4c/73.2/lib")
 
 #################$
 # Origin Library #
