@@ -13,10 +13,15 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 endif(MSVC)
 
-## For mbp
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/homebrew/Cellar/icu4c/73.2/lib")
-## For air
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/Cellar/icu4c/73.2/lib")
+## ICU library path detection (for Boost.Locale/Boost.Regex)
+## Try to find icu4c via homebrew opt symlinks (version-independent)
+if(EXISTS "/opt/homebrew/opt/icu4c@78/lib")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/homebrew/opt/icu4c@78/lib")
+elseif(EXISTS "/opt/homebrew/opt/icu4c/lib")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/homebrew/opt/icu4c/lib")
+elseif(EXISTS "/usr/local/opt/icu4c/lib")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/opt/icu4c/lib")
+endif()
 
 #################$
 # Origin Library #
@@ -30,14 +35,19 @@ include_directories("third_party/asutton/origin")
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 add_definitions(-D_WIN32_WINNT=0x0501)
-find_package(Boost COMPONENTS regex date_time system filesystem unit_test_framework program_options REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
+# Use Boost's native CMake config instead of deprecated FindBoost module
+cmake_policy(SET CMP0167 NEW)
+# Note: 'system' component is header-only since Boost 1.69 and removed in recent versions
+find_package(Boost COMPONENTS regex date_time filesystem unit_test_framework program_options REQUIRED)
+# Use Boost::headers target to get include directories (modern CMake approach)
+# For global include access, we link Boost::headers to all targets via include_directories
+get_target_property(BOOST_INCLUDE_DIRS Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
+include_directories(${BOOST_INCLUDE_DIRS})
 
 macro(boosttest_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN})
-    target_link_libraries(${TESTNAME} PRIVATE ${Boost_FILESYSTEM_LIBRARY}
-                                PRIVATE ${Boost_SYSTEM_LIBRARY}
-                                PRIVATE ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+    target_link_libraries(${TESTNAME} PRIVATE Boost::filesystem
+                                PRIVATE Boost::unit_test_framework)
     add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
