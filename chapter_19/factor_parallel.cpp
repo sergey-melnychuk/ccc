@@ -51,15 +51,15 @@ string factor_task(unsigned long long x) {
   return ss.str();
 }
 
-array<unsigned long long, 6> numbers{ 9'699'690,     179'426'549,   1'000'000'007,
-                                      4'294'967'291, 4'294'967'296, 1'307'674'368'000 };
+array<unsigned long long, 6> to_factor{ 9'699'690,     179'426'549,   1'000'000'007,
+                                        4'294'967'291, 4'294'967'296, 1'307'674'368'000 };
 
 int main() {
   chrono::nanoseconds elapsed_ns;
   {
     Stopwatch stopwatch{ elapsed_ns };
     vector<future<string>> factor_tasks;
-    for(auto number : numbers)
+    for(auto number : to_factor)
       factor_tasks.emplace_back(async(launch::async, factor_task, number));
     for(auto& task : factor_tasks)
       cout << task.get();

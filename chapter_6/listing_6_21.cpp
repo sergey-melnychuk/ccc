@@ -1,16 +1,16 @@
-﻿#include <cstddef>
+﻿#include <concepts>
+#include <cstddef>
 #include <cstdio>
 #include <type_traits>
 
 template <typename T>
-concept bool Averageable() {
-  return std::is_default_constructible<T>::value && std::is_copy_constructible<T>::value && requires(T a, T b) {
-    { a + b }
-    ->T;
-    { a / b }
-    ->T;
+concept Averageable =
+  std::is_default_constructible<T>::value &&
+  std::is_copy_constructible<T>::value &&
+  requires(T a, T b) {
+    { a + b } -> std::convertible_to<T>;
+    { a / b } -> std::convertible_to<T>;
   };
-}
 
 template <Averageable T>
 T mean(const T* values, size_t length) {

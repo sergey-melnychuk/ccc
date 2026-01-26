@@ -2,15 +2,15 @@ cmake_minimum_required(VERSION 3.1...3.14)
 
 project(ccc LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Threads)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 endif(MSVC)
 
 ## ICU library path detection (for Boost.Locale/Boost.Regex)
@@ -36,7 +36,9 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 add_definitions(-D_WIN32_WINNT=0x0501)
 # Use Boost's native CMake config instead of deprecated FindBoost module
-cmake_policy(SET CMP0167 NEW)
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 NEW)
+endif()
 # Note: 'system' component is header-only since Boost 1.69 and removed in recent versions
 find_package(Boost COMPONENTS regex date_time filesystem unit_test_framework program_options REQUIRED)
 # Use Boost::headers target to get include directories (modern CMake approach)
